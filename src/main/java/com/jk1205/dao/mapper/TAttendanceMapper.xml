@@ -1,0 +1,322 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.jk1205.dao.TAttendanceMapper" >
+
+<!-- 查询没有被审批的考勤一    -->
+   <select id="findBySp" resultMap="BaseResultMap">
+               select  b.uname,b.uid,a.* 
+               from  t_attendance  a ,t_user b   
+               where a.attendance_type =2 
+                   and  bossid is null
+                   and  a.empid=b.uid  
+   </select>
+
+   <!-- 查看部门考勤  findByMonthAndAid  -->
+  <select id="findByMonthAndAid"  resultMap="BaseResultMap" >
+  
+       select  b.uname,b.uid, a.*    from  t_attendance a ,t_user b   
+            where  a.empid=b.uid  
+            and   a.attendance_day like "${month}%" and b.gid= #{gid}
+           
+  </select>
+
+   <!-- 查询个人考勤   -->
+   <select id="findByMonthAndEid" resultMap="BaseResultMap">
+   	 
+select a.* from t_attendance a where a.attendance_day like "${month}%" and a.empid= #{uid}
+   </select>
+  
+  <resultMap id="BaseResultMap" type="com.jk1205.pojo.TAttendance" >
+    <id column="kid" property="kid" jdbcType="INTEGER" />
+    <result column="attendance_day" property="attendanceDay" jdbcType="VARCHAR" />
+    <result column="attendance_every" property="attendanceEvery" jdbcType="VARCHAR" />
+    <result column="attendance_time" property="attendanceTime" jdbcType="TIMESTAMP" />
+    <result column="exception_explain" property="exceptionExplain" jdbcType="VARCHAR" />
+    <result column="approval_opinion" property="approvalOpinion" jdbcType="VARCHAR" />
+    <result column="opinion_time" property="opinionTime" jdbcType="TIMESTAMP" />
+    <result column="attendance_type" property="attendanceType" jdbcType="INTEGER" />
+    <result column="empid" property="empid" jdbcType="INTEGER" />
+    <result column="bossid" property="bossid" jdbcType="INTEGER" />
+    
+    <association property="tuser"  javaType="com.jk1205.pojo.TUser">
+           <id  column="uid"  property="uid" />
+    	  <result  column="uname"  property="uname" />
+    </association>
+    
+  </resultMap>
+  <sql id="Example_Where_Clause" >
+    <where >
+      <foreach collection="oredCriteria" item="criteria" separator="or" >
+        <if test="criteria.valid" >
+          <trim prefix="(" suffix=")" prefixOverrides="and" >
+            <foreach collection="criteria.criteria" item="criterion" >
+              <choose >
+                <when test="criterion.noValue" >
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue" >
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue" >
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue" >
+                  and ${criterion.condition}
+                  <foreach collection="criterion.value" item="listItem" open="(" close=")" separator="," >
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Update_By_Example_Where_Clause" >
+    <where >
+      <foreach collection="example.oredCriteria" item="criteria" separator="or" >
+        <if test="criteria.valid" >
+          <trim prefix="(" suffix=")" prefixOverrides="and" >
+            <foreach collection="criteria.criteria" item="criterion" >
+              <choose >
+                <when test="criterion.noValue" >
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue" >
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue" >
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue" >
+                  and ${criterion.condition}
+                  <foreach collection="criterion.value" item="listItem" open="(" close=")" separator="," >
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Base_Column_List" >
+    kid, attendance_day, attendance_every, attendance_time, exception_explain, approval_opinion, 
+    opinion_time, attendance_type, empid, bossid
+  </sql>
+  <select id="selectByExample" resultMap="BaseResultMap" parameterType="com.jk1205.pojo.TAttendanceExample" >
+    select
+    <if test="distinct" >
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    from t_attendance
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null" >
+      order by ${orderByClause}
+    </if>
+  </select>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from t_attendance
+    where kid = #{kid,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from t_attendance
+    where kid = #{kid,jdbcType=INTEGER}
+  </delete>
+  <delete id="deleteByExample" parameterType="com.jk1205.pojo.TAttendanceExample" >
+    delete from t_attendance
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+  </delete>
+  <insert id="insert" parameterType="com.jk1205.pojo.TAttendance" >
+    insert into t_attendance (kid, attendance_day, attendance_every, 
+      attendance_time, exception_explain, approval_opinion, 
+      opinion_time, attendance_type, empid, 
+      bossid)
+    values (#{kid,jdbcType=INTEGER}, #{attendanceDay,jdbcType=VARCHAR}, #{attendanceEvery,jdbcType=VARCHAR}, 
+      #{attendanceTime,jdbcType=TIMESTAMP}, #{exceptionExplain,jdbcType=VARCHAR}, #{approvalOpinion,jdbcType=VARCHAR}, 
+      #{opinionTime,jdbcType=TIMESTAMP}, #{attendanceType,jdbcType=INTEGER}, #{empid,jdbcType=INTEGER}, 
+      #{bossid,jdbcType=INTEGER})
+  </insert>
+  <insert id="insertSelective" parameterType="com.jk1205.pojo.TAttendance" >
+    insert into t_attendance
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="kid != null" >
+        kid,
+      </if>
+      <if test="attendanceDay != null" >
+        attendance_day,
+      </if>
+      <if test="attendanceEvery != null" >
+        attendance_every,
+      </if>
+      <if test="attendanceTime != null" >
+        attendance_time,
+      </if>
+      <if test="exceptionExplain != null" >
+        exception_explain,
+      </if>
+      <if test="approvalOpinion != null" >
+        approval_opinion,
+      </if>
+      <if test="opinionTime != null" >
+        opinion_time,
+      </if>
+      <if test="attendanceType != null" >
+        attendance_type,
+      </if>
+      <if test="empid != null" >
+        empid,
+      </if>
+      <if test="bossid != null" >
+        bossid,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="kid != null" >
+        #{kid,jdbcType=INTEGER},
+      </if>
+      <if test="attendanceDay != null" >
+        #{attendanceDay,jdbcType=VARCHAR},
+      </if>
+      <if test="attendanceEvery != null" >
+        #{attendanceEvery,jdbcType=VARCHAR},
+      </if>
+      <if test="attendanceTime != null" >
+        #{attendanceTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="exceptionExplain != null" >
+        #{exceptionExplain,jdbcType=VARCHAR},
+      </if>
+      <if test="approvalOpinion != null" >
+        #{approvalOpinion,jdbcType=VARCHAR},
+      </if>
+      <if test="opinionTime != null" >
+        #{opinionTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="attendanceType != null" >
+        #{attendanceType,jdbcType=INTEGER},
+      </if>
+      <if test="empid != null" >
+        #{empid,jdbcType=INTEGER},
+      </if>
+      <if test="bossid != null" >
+        #{bossid,jdbcType=INTEGER},
+      </if>
+    </trim>
+  </insert>
+  <select id="countByExample" parameterType="com.jk1205.pojo.TAttendanceExample" resultType="java.lang.Integer" >
+    select count(*) from t_attendance
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+  </select>
+  <update id="updateByExampleSelective" parameterType="map" >
+    update t_attendance
+    <set >
+      <if test="record.kid != null" >
+        kid = #{record.kid,jdbcType=INTEGER},
+      </if>
+      <if test="record.attendanceDay != null" >
+        attendance_day = #{record.attendanceDay,jdbcType=VARCHAR},
+      </if>
+      <if test="record.attendanceEvery != null" >
+        attendance_every = #{record.attendanceEvery,jdbcType=VARCHAR},
+      </if>
+      <if test="record.attendanceTime != null" >
+        attendance_time = #{record.attendanceTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="record.exceptionExplain != null" >
+        exception_explain = #{record.exceptionExplain,jdbcType=VARCHAR},
+      </if>
+      <if test="record.approvalOpinion != null" >
+        approval_opinion = #{record.approvalOpinion,jdbcType=VARCHAR},
+      </if>
+      <if test="record.opinionTime != null" >
+        opinion_time = #{record.opinionTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="record.attendanceType != null" >
+        attendance_type = #{record.attendanceType,jdbcType=INTEGER},
+      </if>
+      <if test="record.empid != null" >
+        empid = #{record.empid,jdbcType=INTEGER},
+      </if>
+      <if test="record.bossid != null" >
+        bossid = #{record.bossid,jdbcType=INTEGER},
+      </if>
+    </set>
+    <if test="_parameter != null" >
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByExample" parameterType="map" >
+    update t_attendance
+    set kid = #{record.kid,jdbcType=INTEGER},
+      attendance_day = #{record.attendanceDay,jdbcType=VARCHAR},
+      attendance_every = #{record.attendanceEvery,jdbcType=VARCHAR},
+      attendance_time = #{record.attendanceTime,jdbcType=TIMESTAMP},
+      exception_explain = #{record.exceptionExplain,jdbcType=VARCHAR},
+      approval_opinion = #{record.approvalOpinion,jdbcType=VARCHAR},
+      opinion_time = #{record.opinionTime,jdbcType=TIMESTAMP},
+      attendance_type = #{record.attendanceType,jdbcType=INTEGER},
+      empid = #{record.empid,jdbcType=INTEGER},
+      bossid = #{record.bossid,jdbcType=INTEGER}
+    <if test="_parameter != null" >
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByPrimaryKeySelective" parameterType="com.jk1205.pojo.TAttendance" >
+    update t_attendance
+    <set >
+      <if test="attendanceDay != null" >
+        attendance_day = #{attendanceDay,jdbcType=VARCHAR},
+      </if>
+      <if test="attendanceEvery != null" >
+        attendance_every = #{attendanceEvery,jdbcType=VARCHAR},
+      </if>
+      <if test="attendanceTime != null" >
+        attendance_time = #{attendanceTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="exceptionExplain != null" >
+        exception_explain = #{exceptionExplain,jdbcType=VARCHAR},
+      </if>
+      <if test="approvalOpinion != null" >
+        approval_opinion = #{approvalOpinion,jdbcType=VARCHAR},
+      </if>
+      <if test="opinionTime != null" >
+        opinion_time = #{opinionTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="attendanceType != null" >
+        attendance_type = #{attendanceType,jdbcType=INTEGER},
+      </if>
+      <if test="empid != null" >
+        empid = #{empid,jdbcType=INTEGER},
+      </if>
+      <if test="bossid != null" >
+        bossid = #{bossid,jdbcType=INTEGER},
+      </if>
+    </set>
+    where kid = #{kid,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.jk1205.pojo.TAttendance" >
+    update t_attendance
+    set attendance_day = #{attendanceDay,jdbcType=VARCHAR},
+      attendance_every = #{attendanceEvery,jdbcType=VARCHAR},
+      attendance_time = #{attendanceTime,jdbcType=TIMESTAMP},
+      exception_explain = #{exceptionExplain,jdbcType=VARCHAR},
+      approval_opinion = #{approvalOpinion,jdbcType=VARCHAR},
+      opinion_time = #{opinionTime,jdbcType=TIMESTAMP},
+      attendance_type = #{attendanceType,jdbcType=INTEGER},
+      empid = #{empid,jdbcType=INTEGER},
+      bossid = #{bossid,jdbcType=INTEGER}
+    where kid = #{kid,jdbcType=INTEGER}
+  </update>
+</mapper>

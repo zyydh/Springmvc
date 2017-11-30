@@ -1,0 +1,23 @@
+﻿<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE configuration
+PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-config.dtd">
+<configuration>
+ 
+	
+	<!-- 全局配置参数，需要时再设置 -->
+	<settings>
+        <setting name="lazyLoadingEnabled" value="true"/>
+        <setting name="cacheEnabled" value="true"/>
+        <setting name="logImpl" value="LOG4J" />  
+	</settings>  
+	
+	<!-- 别名定义  -->
+	<typeAliases>
+	     <!-- 批量指定别名：mybatis回去扫描包下的配置别名 "com.jk1205.pojo   -->
+		<package name="com.jk1205.pojo"/>
+	</typeAliases>
+	
+
+	
+</configuration>
